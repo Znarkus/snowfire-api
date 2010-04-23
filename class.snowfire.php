@@ -29,9 +29,15 @@ class Snowfire
 	private function __clone() {}
 	private function __construct()
 	{
-		$this->storage = new Snowfire_Storage();
+		if (class_exists('Snowfire_Storage')) {
+			$this->storage = new Snowfire_Storage();
+		}
+		
 		$this->gui = new Snowfire_Gui();
-		$this->components = new Snowfire_Component($this->storage);
+		
+		if (isset($this->storage)) {
+			$this->components = new Snowfire_Component($this->storage);
+		}
 	}
 	
 	/**
@@ -53,6 +59,10 @@ class Snowfire
 	
 	public function checkRequest(/*$options = 0*/)
 	{
+		if (!isset($this->storage)) {
+			throw new Exception('No storage defined');
+		}
+		
 		if (isset($_GET['snowfireUserKey'], $_GET['snowfireAppKey'])) {
 			try {
 				$_SESSION['Snowfire']['domain'] = $this->storage->getAccountDomain($_GET['snowfireAppKey']);
