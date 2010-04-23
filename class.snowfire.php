@@ -358,3 +358,40 @@ class Snowfire_Config
 		return (string)$this->_xml->$key;
 	}
 }
+
+class Snowfire_StorageBase
+{
+	/**
+	* Save component data from Snowfire to local cache
+	* 
+	* @param array $data Array of stdClass. Attributes are data and id
+	*/
+	public function saveComponents($data)
+	{
+		var_dump($data);
+		exit('You need to overwrite the Snowfire_StorageBase::saveComponents() method');
+	}
+	
+	/**
+	* Load component data
+	* 
+	* @param string $id
+	* @return string Component HTML data
+	*/
+	public function loadComponent($id)
+	{
+		var_dump($id);
+		exit('You need to overwrite the Snowfire_StorageBase::loadComponent() method');
+	}
+	
+	/**
+	* Map an app key to a Snowfire domain
+	* 
+	* @param string $appKey
+	*/
+	public function getAccountDomain($appKey)
+	{
+		var_dump($appKey);
+		exit('You need to overwrite the Snowfire_StorageBase::getAccountDomain() method');
+	}
+}
