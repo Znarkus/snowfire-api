@@ -22,8 +22,6 @@ class Snowfire
 	*/
 	public $config;
 	
-	//const OPT_REQUIRE_SNOWFIRE = 1;
-	
 	private static $_instance;
 	
 	private function __clone() {}
@@ -57,7 +55,19 @@ class Snowfire
 		);
 	}
 	
-	public function checkRequest(/*$options = 0*/)
+	/**
+	* Checks if the request contains any parameters from Snowfire.
+	* If there are, it saves them to the session and redirects the
+	* user to this current page, but without the Snowfire parameters.
+	* 
+	* Loads container view data from Snowfire.
+	* 
+	* Requires Snowfire_Storage
+	* 
+	* @throws Exception If no Snowfire parameters are present and no has been set
+	* 
+	*/
+	public function checkRequest()
 	{
 		if (!isset($this->storage)) {
 			throw new Exception('No storage defined');
@@ -86,16 +96,18 @@ class Snowfire
 			header('Location: ' . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')));
 			exit;
 			
-		} else if (/*self::optionPresent(self::OPT_REQUIRE_SNOWFIRE, $options) && */!isset($_SESSION['Snowfire'])) {
-			die('Invalid request, no Snowfire credentials found');
+		} else if (!isset($_SESSION['Snowfire'])) {
+			throw new Exception('Invalid request, no Snowfire credentials found');
 		}
 	}
 	
 	/**
 	* Get the URL to redirect the user to, to install as an application in Snowfire
 	* 
+	* @param string $snowfireDomain The Snowfire domain url
 	* @param string $installUrl The URL to get the application description xml
 	* @param string $returnUrl An URL to return to when the install has succeded. Defaults to current URL
+	* @param boolean $forceSnowfireLogin If Snowfire should force the user to login
 	* @return string
 	*/
 	public function getInstallUrl($snowfireDomain, $installUrl, $returnUrl = null, $forceSnowfireLogin = false)
@@ -214,6 +226,9 @@ class Snowfire_Helper
 	}
 }
 
+/**
+* For component parameters, please visit http://wiki.snowfireapp.com/Template_components
+*/
 class Snowfire_Component
 {
 	/**
@@ -236,6 +251,12 @@ class Snowfire_Component
 		}
 	}
 	
+	/**
+	* Get the Snowfire url to edit (this) page's components
+	* 
+	* @param string $editableUrl What url to edit. Defaults to the current url
+	* @param string $returnUrl What url to return to on save. Defaults to the current url
+	*/
 	public function getEditUrl($editableUrl = null, $returnUrl = null)
 	{
 		$editableUrl = isset($editableUrl) ? $editableUrl : $_SERVER['REQUEST_URI'];
@@ -294,6 +315,11 @@ class Snowfire_Component
 
 class Snowfire_Gui
 {
+	/**
+	* Render supplied HTML in the container
+	* 
+	* @param string|Snowfire_Gui_View $html
+	*/
 	public function render($html)
 	{
 		$container = new Snowfire_Gui_View('resources/views/container.phtml');
@@ -323,6 +349,12 @@ class Snowfire_Gui_View
 		return $this->_data[$key];
 	}
 	
+	/**
+	* Render view
+	* 
+	* @param array $variables
+	* @return string HTML
+	*/
 	public function render($variables = array())
 	{
 		if (!empty($variables)) {
