@@ -41,9 +41,9 @@ class Snowfire
 	}
 	
 	/**
-	* config or configData must be set
+	* Loads the config
 	* 
-	* @param mixed $options
+	* @param array $options Options 'config' or 'configData' must be set
 	*/
 	public function initialize($options = array())
 	{
@@ -359,7 +359,7 @@ class Snowfire_Config
 	}
 }
 
-class Snowfire_StorageBase
+abstract class Snowfire_StorageBase
 {
 	/**
 	* Save component data from Snowfire to local cache
