@@ -84,7 +84,7 @@ class Snowfire
 			$_SESSION['Snowfire']['userKey'] = $_GET['snowfireUserKey'];
 			
 			try {
-				$jsonData = $this->_getUrl(
+				$jsonData = Snowfire_Helper::getUrl(
 					$_SESSION['Snowfire']['domain'] . 'a;applications/application/getContainerData?APP_KEY=' . $_GET['snowfireAppKey'] . '&USER_KEY=' . $_GET['snowfireUserKey']
 				);
 			} catch (Exception $e) {
@@ -133,8 +133,37 @@ class Snowfire
 		
 		return self::$_instance;
 	}
+}
+
+
+class Snowfire_Helper
+{
+	public static function useragentIsSnowfire()
+	{
+		return stristr($_SERVER['HTTP_USER_AGENT'], 'snowfire');
+	}
 	
-	private function _getUrl($url, $post = array(), $get = array())
+	public static function optionPresent($option, $options)
+	{
+		return ($options & $option) == $option;
+	}
+	
+	public static function options($default, $set, $required = array())
+	{
+		if (count(array_diff($required, array_keys($set))) != 0) {
+			throw new InvalidArgumentException('Options ' . implode(', ', $required) . ' are required');
+		}
+		
+		$options = $default;
+		
+		foreach ($set as $key => $value) {
+			$options[$key] = $value;
+		}
+		
+		return $options;
+	}
+	
+	public static function getUrl($url, $post = array(), $get = array())
 	{
 		if (empty($url) || is_null($url)) {
 			throw new Exception('Bad url "' . $url . '"');
@@ -194,35 +223,6 @@ class Snowfire
 		}
 		
 		return $return;
-	}
-}
-
-
-class Snowfire_Helper
-{
-	public static function useragentIsSnowfire()
-	{
-		return stristr($_SERVER['HTTP_USER_AGENT'], 'snowfire');
-	}
-	
-	public static function optionPresent($option, $options)
-	{
-		return ($options & $option) == $option;
-	}
-	
-	public static function options($default, $set, $required = array())
-	{
-		if (count(array_diff($required, array_keys($set))) != 0) {
-			throw new InvalidArgumentException('Options ' . implode(', ', $required) . ' are required');
-		}
-		
-		$options = $default;
-		
-		foreach ($set as $key => $value) {
-			$options[$key] = $value;
-		}
-		
-		return $options;
 	}
 }
 
